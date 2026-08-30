@@ -4,8 +4,6 @@ A starter repository that sets up a development environment on a new or reset Ma
 
 ## Run it
 
-~/Developer/mac-config/install.sh
-
 The script does the following:
 
 - Installs Homebrew if it is missing. It supports the Apple Silicon path: /opt/homebrew.
@@ -16,6 +14,12 @@ The script does the following:
 - Applies common macOS settings.
 
 You can run the script again at any time. It keeps correct symbolic links and does not update installed Homebrew packages without a reason.
+
+```
+git clone https://github.com/bedoodev/mac-config.git
+cd mac-config
+./install.sh
+```
 
 ## Installed software
 
@@ -37,15 +41,6 @@ Terminal and development tools:
 It also installs the Go, Python, Pylance, and Ruff extensions for VS Code.
 
 Note: lazydocker needs a running Docker engine. This starter does not install Docker Desktop automatically.
-
-## Git identity
-
-Your name and email are not stored in this repository. After installation, add them to your local file:
-
-    git config --file ~/.gitconfig.local user.name "Your Name"
-    git config --file ~/.gitconfig.local user.email "you@example.com"
-
-If you use different work and personal identities, you can use Git conditional includes instead of one ~/.gitconfig.local file.
 
 ## Skip Node.js installation
 
