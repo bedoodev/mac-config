@@ -30,6 +30,7 @@ shell-integration = zsh
 
 # macOS
 macos-option-as-alt = left
+keybind = alt+backspace=text:\x17
 
 # Tabs & Splits
 keybind = super+t=new_tab
@@ -39,11 +40,11 @@ keybind = super+shift+d=new_split:right
 
 # Clipboard
 # Ghostty seçimi varsa onu kopyala; yoksa Cmd+C'yi çalışan uygulamaya geçir.
+keybind = unconsumed:super+a=select_all
 keybind = performable:super+c=copy_to_clipboard:mixed
 keybind = super+v=paste_from_clipboard
 
 # Send single-byte control codes that pass through the PTY unchanged.
-keybind = super+a=text:\x01
 keybind = super+b=text:\x02
 keybind = super+z=text:\x1a
 keybind = super+shift+z=text:\x19

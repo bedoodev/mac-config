@@ -116,21 +116,6 @@ command -v starship >/dev/null 2>&1 &&
 # Interactive ZLE configuration
 if [[ -o interactive ]]; then
 
-  # Cmd gibi genişletilmiş modifier'ların zsh'a CSI-u olarak ulaşmasını sağla.
-  # Komut çalıştırılırken modu kapat; nvim gibi uygulamalar kendi protokolünü yönetir.
-  autoload -Uz add-zle-hook-widget
-
-  enable-kitty-keyboard() {
-    printf '\e[>1u'
-  }
-
-  disable-kitty-keyboard() {
-    printf '\e[<u'
-  }
-
-  add-zle-hook-widget line-init enable-kitty-keyboard
-  add-zle-hook-widget line-finish disable-kitty-keyboard
-
 	# Prefix-based history search
 	autoload -Uz history-search-end
 

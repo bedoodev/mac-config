@@ -1,7 +1,6 @@
 local Modal = require("config.modal")
 local stage = {}
 local commit = {}
-local last_messages = {}
 local stage_highlight_ns = vim.api.nvim_create_namespace("git_ui_stage")
 
 local function notify(message, level)
@@ -308,6 +307,13 @@ local function commit_message()
   return vim.trim(table.concat(lines, "\n"))
 end
 
+local function close_commit()
+  if commit_is_open() then
+    vim.api.nvim_win_close(commit.win, true)
+  end
+  commit = {}
+end
+
 local function create_commit()
   if not commit_is_open() then
     return
@@ -328,7 +334,7 @@ local function create_commit()
     return
   end
 
-  last_messages[commit.root] = message
+  vim.api.nvim_buf_set_lines(commit.buf, 0, -1, false, { "" })
   vim.bo[commit.buf].modified = false
   update_commit_title()
   refresh_stage()
@@ -367,18 +373,12 @@ local function push_commit()
     end
     local ok, output = git(commit.root, command)
     if ok then
+      close_commit()
       notify("Push completed")
     else
       notify(output ~= "" and output or "Push failed", vim.log.levels.ERROR)
     end
   end)
-end
-
-local function close_commit()
-  if commit_is_open() then
-    vim.api.nvim_win_close(commit.win, true)
-  end
-  commit = {}
 end
 
 local function open_git_commit()
@@ -422,8 +422,7 @@ local function open_git_commit()
   vim.wo[win].relativenumber = false
   vim.wo[win].signcolumn = "no"
 
-  local previous = last_messages[root]
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { previous or "" })
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "" })
   vim.bo[buf].modified = false
 
   local opts = { buffer = buf, nowait = true, silent = true }
