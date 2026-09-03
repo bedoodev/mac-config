@@ -1,5 +1,6 @@
 # Command-line essentials
 brew "git"
+brew "neovim"
 brew "go"
 brew "bun"
 brew "pyenv"

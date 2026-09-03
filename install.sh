@@ -50,36 +50,51 @@ if ! xcode-select -p >/dev/null 2>&1; then
 fi
 success "Command Line Tools are ready"
 
-info "Setting up Homebrew"
-if ! command -v brew >/dev/null 2>&1; then
+if [ "${SKIP_BREW:-0}" != "1" ]; then
+  info "Setting up Homebrew"
+  if ! command -v brew >/dev/null 2>&1; then
+    if [ -x /opt/homebrew/bin/brew ]; then
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x /usr/local/bin/brew ]; then
+      eval "$(/usr/local/bin/brew shellenv)"
+    else
+      NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+  fi
+
   if [ -x /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   elif [ -x /usr/local/bin/brew ]; then
     eval "$(/usr/local/bin/brew shellenv)"
-  else
-    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
+
+  command -v brew >/dev/null 2>&1 || fail "Homebrew could not be added to PATH."
+  success "Homebrew is ready: $(brew --prefix)"
+
+  info "Installing apps and terminal tools"
+  HOMEBREW_BUNDLE_NO_UPGRADE=1 brew bundle --file="$REPO_DIR/Brewfile"
+  success "Homebrew packages are ready"
+else
+  info "Skipping Homebrew because SKIP_BREW=1"
 fi
-
-if [ -x /opt/homebrew/bin/brew ]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [ -x /usr/local/bin/brew ]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-fi
-
-command -v brew >/dev/null 2>&1 || fail "Homebrew could not be added to PATH."
-success "Homebrew is ready: $(brew --prefix)"
-
-info "Installing apps and terminal tools"
-HOMEBREW_BUNDLE_NO_UPGRADE=1 brew bundle --file="$REPO_DIR/Brewfile"
-success "Homebrew packages are ready"
 
 info "Linking configuration files"
 backup_and_link "$REPO_DIR/zsh/.zshrc" "$HOME/.zshrc"
-backup_and_link "$REPO_DIR/ghostty/config" "$HOME/.config/ghostty/config"
+backup_and_link "$REPO_DIR/ghostty/config" "$HOME/.config/ghostty/config.ghostty"
+backup_and_link "$REPO_DIR/ghostty/config" "$HOME/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
 backup_and_link "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
 backup_and_link "$REPO_DIR/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
 backup_and_link "$REPO_DIR/git/.gitconfig.example" "$HOME/.gitconfig"
+backup_and_link "$REPO_DIR/nvim" "$HOME/.config/nvim"
+
+if [ "${SKIP_NVIM_PLUGINS:-0}" != "1" ]; then
+  info "Installing Neovim plugins"
+  command -v nvim >/dev/null 2>&1 || fail "Neovim is not installed."
+  nvim --headless "+Lazy! sync" +qa
+  success "Neovim plugins are ready"
+else
+  info "Skipping Neovim plugins because SKIP_NVIM_PLUGINS=1"
+fi
 
 mkdir -p "$HOME/.nvm"
 
@@ -91,9 +106,13 @@ if [ "$SKIP_NODE_VALUE" != "1" ]; then
   NVM_SCRIPT="$(brew --prefix nvm)/nvm.sh"
   if [ -s "$NVM_SCRIPT" ]; then
     . "$NVM_SCRIPT"
-    nvm install --lts
-    nvm alias default 'lts/*'
-    success "Node.js LTS is ready"
+    if command -v node >/dev/null 2>&1; then
+      success "Node.js is already installed: $(node --version)"
+    else
+      nvm install --lts
+      nvm alias default 'lts/*'
+      success "Node.js LTS is ready"
+    fi
   else
     fail "NVM is installed, but nvm.sh was not found."
   fi
@@ -101,8 +120,12 @@ else
   info "Skipping Node.js because SKIP_NODE=1"
 fi
 
-info "Applying macOS settings"
-"$REPO_DIR/macos/defaults.sh"
+if [ "${SKIP_MACOS:-0}" != "1" ]; then
+  info "Applying macOS settings"
+  "$REPO_DIR/macos/defaults.sh"
+else
+  info "Skipping macOS settings because SKIP_MACOS=1"
+fi
 
 printf '\n'
 success "New Mac setup is complete."

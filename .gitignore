@@ -3,3 +3,4 @@
 *.local
 *.secret
 secrets/
+nvim/.git/
