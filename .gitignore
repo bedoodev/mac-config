@@ -4,3 +4,4 @@
 *.secret
 secrets/
 nvim/.git/
+.DS_Store

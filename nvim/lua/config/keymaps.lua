@@ -74,9 +74,15 @@ map("n", "W", function()
 end, { desc = "Close tab" })
 map("n", "E", "<cmd>bnext<cr>", { desc = "Next tab" })
 map("n", "Q", "<cmd>bprevious<cr>", { desc = "Previous tab" })
+map("n", "p", "<Nop>", { desc = "Disable paste" })
 map({ "n", "i" }, "<C-b>", "<cmd>ExplorerToggle<cr>", { desc = "Toggle explorer" })
 
--- Cmd + Z: undo
+-- Cmd + S: save
+for _, lhs in ipairs({ "<D-s>", "<Esc>[115;9u" }) do
+  map({ "n", "i", "x", "s" }, lhs, "<Cmd>write<CR>", { desc = "Save file" })
+end
+
+-- Cmd + Z: undo; Cmd + Shift + Z: redo
 local function map_command_z(lhs)
   map("n", lhs, "u", { desc = "Undo" })
   map("i", lhs, "<C-o>u", { desc = "Undo" })

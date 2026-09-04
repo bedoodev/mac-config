@@ -137,8 +137,31 @@ if [[ -o interactive ]]; then
 
     bindkey -M "$keymap" '\e[99~' beginning-of-line
     bindkey -M "$keymap" '\e[100~' end-of-line
+    bindkey -M "$keymap" '\e[H' beginning-of-line
+    bindkey -M "$keymap" '\e[F' end-of-line
+    bindkey -M "$keymap" '\e[1;9D' beginning-of-line
+    bindkey -M "$keymap" '\e[1;9C' end-of-line
     bindkey -M "$keymap" '\e[101~' beginning-of-history
     bindkey -M "$keymap" '\e[102~' end-of-history
+  done
+
+  # Plain Left/Right stops extending an active Shift selection.
+  deselect-backward-char() {
+    REGION_ACTIVE=0
+    zle .backward-char
+  }
+
+  deselect-forward-char() {
+    REGION_ACTIVE=0
+    zle .forward-char
+  }
+
+  zle -N deselect-backward-char
+  zle -N deselect-forward-char
+
+  for keymap in emacs viins; do
+    bindkey -M "$keymap" '^[[D' deselect-backward-char
+    bindkey -M "$keymap" '^[[C' deselect-forward-char
   done
 
   # Shift + Left

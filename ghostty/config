@@ -39,15 +39,14 @@ keybind = super+shift+enter=new_split:down
 keybind = super+shift+d=new_split:right
 
 # Clipboard
-# Ghostty seçimi varsa onu kopyala; yoksa Cmd+C'yi çalışan uygulamaya geçir.
 keybind = unconsumed:super+a=select_all
-keybind = performable:super+c=copy_to_clipboard:mixed
+keybind = super+c=csi:99;9u
 keybind = super+v=paste_from_clipboard
 
-# Send single-byte control codes that pass through the PTY unchanged.
+# Send key sequences handled by the Zsh and terminal application bindings.
 keybind = super+b=text:\x02
-keybind = super+z=text:\x1a
-keybind = super+shift+z=text:\x19
+keybind = super+z=csi:122;9u
+keybind = super+shift+z=csi:122;10u
 
 # Shift + Arrow
 keybind = shift+left=csi:1;2D

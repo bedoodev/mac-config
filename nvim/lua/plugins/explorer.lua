@@ -255,7 +255,9 @@ local function add_explorer_resize_keymaps(picker)
     local width = vim.api.nvim_win_get_width(win)
     local min_width = math.max(1, math.floor(vim.o.columns * 0.15))
     local max_width = math.max(min_width, math.floor(vim.o.columns * 0.5))
-    vim.api.nvim_win_set_width(win, math.max(min_width, math.min(max_width, width + delta)))
+    picker.layout.opts.layout.width = math.max(min_width, math.min(max_width, width + delta))
+    vim.api.nvim_win_set_width(picker.layout.root.win, picker.layout.opts.layout.width)
+    picker.layout:update()
     explorer_width = vim.api.nvim_win_get_width(win)
   end
 
